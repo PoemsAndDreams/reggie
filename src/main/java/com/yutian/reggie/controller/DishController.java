@@ -7,10 +7,12 @@ import com.yutian.reggie.common.R;
 import com.yutian.reggie.dto.DishDto;
 import com.yutian.reggie.entity.Category;
 import com.yutian.reggie.entity.Dish;
+import com.yutian.reggie.entity.DishFlavor;
 import com.yutian.reggie.service.CategoryService;
 import com.yutian.reggie.service.DishFlavorService;
 import com.yutian.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -122,6 +124,57 @@ public class DishController {
 
         dishService.updateWithFlavor(dishDto);
 
-        return R.success("新增菜品成功");
+        return R.success("修改菜品成功");
+    }
+
+    /**
+     * 根据条件查询对应的菜品数据
+     * @param dish
+     * @return
+     */
+    /*@GetMapping("/list")
+    public R<List<Dish>> list(Dish dish){
+        //构造查询条件
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(dish.getCategoryId() != null ,Dish::getCategoryId,dish.getCategoryId());
+        //添加条件，查询状态为1（起售状态）的菜品
+        queryWrapper.eq(Dish::getStatus,1);
+
+        //添加排序条件
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(queryWrapper);
+
+        return R.success(list);
+    }*/
+
+    @GetMapping("/list")
+    public R<List<DishDto>> list(Dish dish) {
+        log.info("dish:{}", dish);
+        //条件构造器
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(dish.getName()), Dish::getName, dish.getName());
+        queryWrapper.eq(null != dish.getCategoryId(), Dish::getCategoryId, dish.getCategoryId());
+        //添加条件，查询状态为1（起售状态）的菜品
+        queryWrapper.eq(Dish::getStatus,1);
+        queryWrapper.orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> dishs = dishService.list(queryWrapper);
+
+        List<DishDto> dishDtos = dishs.stream().map(item -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item, dishDto);
+            Category category = categoryService.getById(item.getCategoryId());
+            if (category != null) {
+                dishDto.setCategoryName(category.getName());
+            }
+            LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(DishFlavor::getDishId, item.getId());
+
+            dishDto.setFlavors(dishFlavorService.list(wrapper));
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return R.success(dishDtos);
     }
 }
