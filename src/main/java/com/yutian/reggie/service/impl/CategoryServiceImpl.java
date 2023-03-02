@@ -4,7 +4,6 @@ package com.yutian.reggie.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yutian.reggie.common.CustomException;
-import com.yutian.reggie.entity.Category;
 import com.yutian.reggie.entity.Dish;
 import com.yutian.reggie.entity.Setmeal;
 import com.yutian.reggie.mapper.CategoryMapper;
@@ -13,9 +12,10 @@ import com.yutian.reggie.service.DishService;
 import com.yutian.reggie.service.SetmealService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.yutian.reggie.entity.Category;
 
 @Service
-public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
+public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> implements CategoryService {
 
     @Autowired
     private DishService dishService;

@@ -1,7 +1,6 @@
 package com.yutian.reggie.service;
 
 
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yutian.reggie.dto.SetmealDto;
 import com.yutian.reggie.entity.Setmeal;
@@ -20,4 +19,19 @@ public interface SetmealService extends IService<Setmeal> {
      * @param ids
      */
     public void removeWithDish(List<Long> ids);
+
+
+    /**
+     * 根据套餐id修改售卖状态
+     * @param status
+     * @param ids
+     */
+    void updateSetmealStatusById(Integer status,List<Long> ids);
+
+
+    /**
+     * 回显套餐数据：根据套餐id查询套餐
+     * @return
+     */
+    SetmealDto getDate(Long id);
 }
